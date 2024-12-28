@@ -1,0 +1,321 @@
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title>Flappy Bird</title>
+      <style>
+          body {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+              background: #333;
+          }
+          #game-container {
+              position: relative;
+              width: 400px;
+              height: 600px;
+              overflow: hidden;
+              background: url('https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/61168638/LbOyxncRsu4nwdNL.jpg?Expires=1735086664&Signature=F0RpqYOxAq8E9yrRIIUm~YgdcgfRtSqsKAl5kU8keqx7jD7TRYM4C1LQthcbMUkDB0G8EB3U0ja0WbvqPfraKWZQIb9VRBiihWJ1ITWnXqutX8fpt~3gn5II0wH9R752fkazoIrzhFHnIt6ZuskL4Ko06qpr3P~KcA6slegJh-9oFDEHJGvWSjMuoQ9rvJk0hv71lM~wGoiz4an~2~s2xtHM1aw~IDADdqYfVWr1pNh26j78E3ldRUIMtp1lQtBHjSfsFsQie3jHMkAukKKTgx0yZ9MZyf0ko~cnYrVqxn9u57OU15EK2EZN7PKOKWKcm7Iv1CtiU-T6dQuwFXrG1A__&Key-Pair-Id=K3USGZIKWMDCSX');
+          }
+          #bird {
+              position: absolute;
+              width: 40px;
+              height: 40px;
+              left: 50px;
+              top: 300px;
+              transition: transform 0.1s;
+              background-image: url('https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/61168638/VO3ZofitcralA5Or.png?Expires=1735084057&Signature=lcvgZ~dBNRO8dVTwvU3V~EMUnjbysj6Fp1VOPeMpF7hGApYI8pcloUbfHSN6DjsRDPWAqbXwDpw6pEjFOn3aLJTolJuDPaTulhi~62stWQ3OTpUQUf8G1lCoe65~Ydu0Ke55Sp7zxC2P6Xo8h3t8holWWLWMYwBRLwYIxvhQ-Vx9SxSJPZaQsFDlUJVTR9DbUimDM9R0N3xbmTYxxbfrgAqETTk7xMoSBkYiAER59IZNTC6APAZHrimdOJTe9SB30oAHzAahB-ZFl~PPzL5SzGihoKfkE5A~EEHB7IwQ8ueMRfp0tWQUBJha7xVN1pBtruaL~0cDNEyh~N-xwt81Eg__&Key-Pair-Id=K3USGZIKWMDCSX');
+              background-size: contain;
+              background-repeat: no-repeat;
+              background-position: center;
+          }
+          .pipe {
+              position: absolute;
+              width: 60px;
+          }
+          .pipe.top {
+              display: flex;
+              flex-direction: column;
+          }
+          .pipe.bottom {
+              display: flex;
+              flex-direction: column-reverse;
+          }
+          .pipe-eraser {
+              height: 40px;
+              background-color: white;
+              border: 3px solid #d3d3d3;
+              border-bottom: none;
+          }
+          .pipe-metal {
+              height: 20px;
+              background: linear-gradient(to bottom, #A9A9A9, #808080);
+              border: 3px solid #696969;
+              border-top: none;
+              border-bottom: none;
+          }
+          .pipe-body {
+              flex-grow: 1;
+              background: black;
+              border: 3px solid #333;
+              border-top: none;
+          }
+          .money {
+              position: absolute;
+              width: 30px;
+              height: 30px;
+              background-image: url('https://d41chssnpqdne.cloudfront.net/user_upload_by_module/chat_bot/files/61168638/2J7rA1uZXZZRuYBa.png?Expires=1735084444&Signature=W9s9FpCrqrNl03fj8yJnqgOjsrTJzW4uoWr1oMCY-l3yAnEdhfjlDLtpnk5SEulhchAGj145KdEUL6Pj1FK1v2ulA9Sh-MqYz5Q7KncsjLK-8ranG-uP0MVxRCRHqV2LwEF7GsJS0EpLu2GbWUjY6MUsqkg1Y4dq-wxBr1WG4uOblEHH8pJkXRKa9G5TLcuu8ATk8Vz0FjTDiYq4gXkhxy42gDwc4Aypq5vvUtr2jxG9QXoCCViETCgkITx-rmBTdInJ5jBEE0yTrKDjIFMR~cjoeFHZAhXl~XE3tJHnz8d7t-kGLULNS8cwJ7v72zJGtmFehxvAY9NaiNEKs2Gghg__&Key-Pair-Id=K3USGZIKWMDCSX');
+              background-size: contain;
+              background-repeat: no-repeat;
+              background-position: center;
+              z-index: 1;
+          }
+          #score {
+              position: absolute;
+              top: 20px;
+              left: 20px;
+              color: black;  /* Changed from white to black */
+              font-size: 24px;
+              font-family: Arial, sans-serif;
+              z-index: 1;
+          }
+          #start-message {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              color: #333;
+              font-size: 24px;
+              font-family: Arial, sans-serif;
+              text-align: center;
+              z-index: 2;
+              background-color: rgba(255, 255, 255, 0.8);
+              padding: 20px;
+              border-radius: 10px;
+          }
+      </style>
+  </head>
+  <body>
+      <div id="game-container">
+          <div id="score">Score: 0</div>
+          <div id="bird"></div>
+          <div id="start-message">Press SPACE to start</div>
+      </div>
+
+      <script>
+          const gameContainer = document.getElementById('game-container');
+          const bird = document.getElementById('bird');
+          const scoreElement = document.getElementById('score');
+          const startMessage = document.getElementById('start-message');
+
+          let gameStarted = false;
+          let birdY = 300;
+          let velocity = 0;
+          let score = 0;
+          let pipes = [];
+          let moneyElements = [];
+          let gameLoop;
+          let lastPipePosition = 0;
+
+          function createPipe() {
+              const gap = 200;
+              const minHeight = 50;
+              const maxHeight = gameContainer.offsetHeight - gap - minHeight;
+              const topHeight = Math.random() * (maxHeight - minHeight) + minHeight;
+
+              const topPipe = document.createElement('div');
+              topPipe.className = 'pipe top';
+              topPipe.style.height = topHeight + 'px';
+              topPipe.style.left = '400px';
+              topPipe.style.top = '0';
+
+              const topEraser = document.createElement('div');
+              topEraser.className = 'pipe-eraser';
+              const topMetal = document.createElement('div');
+              topMetal.className = 'pipe-metal';
+              const topBody = document.createElement('div');
+              topBody.className = 'pipe-body';
+
+              topPipe.appendChild(topEraser);
+              topPipe.appendChild(topMetal);
+              topPipe.appendChild(topBody);
+
+              const bottomPipe = document.createElement('div');
+              bottomPipe.className = 'pipe bottom';
+              bottomPipe.style.height = (gameContainer.offsetHeight - topHeight - gap) + 'px';
+              bottomPipe.style.left = '400px';
+              bottomPipe.style.bottom = '0';
+
+              const bottomEraser = document.createElement('div');
+              bottomEraser.className = 'pipe-eraser';
+              const bottomMetal = document.createElement('div');
+              bottomMetal.className = 'pipe-metal';
+              const bottomBody = document.createElement('div');
+              bottomBody.className = 'pipe-body';
+
+              bottomPipe.appendChild(bottomEraser);
+              bottomPipe.appendChild(bottomMetal);
+              bottomPipe.appendChild(bottomBody);
+
+              gameContainer.appendChild(topPipe);
+              gameContainer.appendChild(bottomPipe);
+
+              lastPipePosition = topHeight + gap;
+              return { top: topPipe, bottom: bottomPipe, passed: false };
+          }
+
+          function createMoney() {
+              const money = document.createElement('div');
+              money.className = 'money';
+              money.style.left = '400px';
+              const randomOffset = Math.random() * 100 - 50;
+              const moneyY = Math.max(50, Math.min(550, lastPipePosition - 100 + randomOffset));
+              money.style.top = moneyY + 'px';
+              gameContainer.appendChild(money);
+              return money;
+          }
+
+          function checkCollision(pipe) {
+              const birdRect = bird.getBoundingClientRect();
+              const topPipeRect = pipe.top.getBoundingClientRect();
+              const bottomPipeRect = pipe.bottom.getBoundingClientRect();
+
+              return (
+                  birdRect.right > topPipeRect.left &&
+                  birdRect.left < topPipeRect.right && (
+                      birdRect.top < topPipeRect.bottom ||
+                      birdRect.bottom > bottomPipeRect.top
+                  )
+              );
+          }
+
+          function updateGame() {
+              if (!gameStarted) return;
+
+              velocity += 0.5;
+              birdY += velocity;
+              bird.style.top = birdY + 'px';
+              bird.style.transform = `rotate(${velocity * 3}deg)`;
+
+              if (pipes.length === 0 || parseInt(pipes[pipes.length - 1].top.style.left) < 200) {
+                  pipes.push(createPipe());
+                  if (Math.random() < 0.5) {
+                      moneyElements.push(createMoney());
+                  }
+              }
+
+              pipes.forEach((pipe, index) => {
+                  const currentLeft = parseInt(pipe.top.style.left);
+                  const newLeft = currentLeft - 2;
+                  pipe.top.style.left = `${newLeft}px`;
+                  pipe.bottom.style.left = `${newLeft}px`;
+
+                  if (!pipe.passed && newLeft < 40) {
+                      pipe.passed = true;
+                      score++;
+                      scoreElement.textContent = `Score: ${score}`;
+                  }
+
+                  if (newLeft < -60) {
+                      gameContainer.removeChild(pipe.top);
+                      gameContainer.removeChild(pipe.bottom);
+                      pipes.splice(index, 1);
+                  }
+
+                  if (checkCollision(pipe)) {
+                      gameOver();
+                  }
+              });
+
+              moneyElements.forEach((money, index) => {
+                  const currentLeft = parseInt(money.style.left);
+                  const newLeft = currentLeft - 2;
+                  money.style.left = `${newLeft}px`;
+
+                  const moneyRect = money.getBoundingClientRect();
+                  const birdRect = bird.getBoundingClientRect();
+
+                  if (
+                      birdRect.right > moneyRect.left &&
+                      birdRect.left < moneyRect.right &&
+                      birdRect.bottom > moneyRect.top &&
+                      birdRect.top < moneyRect.bottom
+                  ) {
+                      score += 5;
+                      scoreElement.textContent = `Score: ${score}`;
+                      gameContainer.removeChild(money);
+                      moneyElements.splice(index, 1);
+                  }
+
+                  if (newLeft < -30) {
+                      gameContainer.removeChild(money);
+                      moneyElements.splice(index, 1);
+                  }
+              });
+
+              if (birdY < 0 || birdY > gameContainer.offsetHeight - 40) {
+                  gameOver();
+              }
+          }
+
+          function gameOver() {
+              gameStarted = false;
+              clearInterval(gameLoop);
+              startMessage.style.display = 'block';
+              startMessage.innerHTML = `Game Over!<br>Score: ${score}<br>Press SPACE to restart`;
+          }
+
+          function startGame() {
+              pipes.forEach(pipe => {
+                  gameContainer.removeChild(pipe.top);
+                  gameContainer.removeChild(pipe.bottom);
+              });
+              moneyElements.forEach(money => {
+                  gameContainer.removeChild(money);
+              });
+              
+              pipes = [];
+              moneyElements = [];
+              birdY = 300;
+              velocity = 0;
+              score = 0;
+              bird.style.top = birdY + 'px';
+              bird.style.transform = 'rotate(0deg)';
+              scoreElement.textContent = 'Score: 0';
+              startMessage.style.display = 'none';
+              
+              gameStarted = true;
+              gameLoop = setInterval(updateGame, 20);
+          }
+
+          document.addEventListener('keydown', (e) => {
+              if (e.code === 'Space') {
+                  e.preventDefault();
+                  if (!gameStarted) {
+                      startGame();
+                  } else {
+                      velocity = -8;
+                  }
+              }
+          });
+
+          document.addEventListener('touchstart', (e) => {
+              e.preventDefault();
+              if (!gameStarted) {
+                  startGame();
+              } else {
+                  velocity = -8;
+              } 
+          });
+      </script>
+  </body>
+  </html>                                                                     <iframe 
+<iframe 
+    src="https://open.spotify.com/embed/playlist/7BahAz6TE6wagqS5m3w5Zb?autoplay=1" 
+    width="300" 
+    height="80" 
+    frameborder="0" 
+    allowtransparency="true" 
+    allow="autoplay; encrypted-media">
+</iframe>
